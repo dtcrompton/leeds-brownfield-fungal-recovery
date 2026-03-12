@@ -1,149 +1,132 @@
-# Leeds Fungal Biodiversity Recovery
+# Leeds Fungal Biodiversity Analysis
 
-**Time-series analysis of fungal biodiversity trends in Leeds (2009-2025) and correlation with citywide restoration initiatives**
+Time-series analysis of fungal biodiversity trends in Leeds (2009–2025) and correlation with urban tree planting programmes.
 
-## Project Overview
+**Live project:** [dtcrompton.github.io/projects/fungi](https://dtcrompton.github.io/projects/fungi/index.html)
+**Interactive map:** [dtcrompton.github.io/projects/fungi/map.html](https://dtcrompton.github.io/projects/fungi/map.html)
 
-This project investigates whether fungal biodiversity in Leeds has increased between 2009-2025 and whether temporal patterns correlate with the timing of urban tree planting and restoration programmes (White Rose Forest, Northern Forest partnership, brownfield redevelopment).
+---
 
-Using 10,200 GBIF fungal occurrence records, I analyse species richness trends, functional composition changes (mycorrhizal vs. saprotrophic fungi), and identify indicator species of ecological recovery.
+## Finding
 
-**Research Questions:**
-1. Has fungal species richness in Leeds increased between 2009-2025?
-2. Do biodiversity increases correlate with major tree planting initiatives?
-3. Are mycorrhizal fungi (tree-dependent) increasing relative to saprotrophic fungi (deadwood decomposers)?
-4. Which fungal species are early indicators of ecological recovery?
+Fungal diversity declined after the major Leeds tree planting schemes of 2020–2022, not increased. Rarefied species richness peaked around 2015–2017 and has fallen sharply since 2020. The functional composition shift — mycorrhizal proportion declining, saprotrophic proportion rising — is consistent with short-term mycorrhizal network disruption caused by soil disturbance during planting.
 
-**This is a citywide temporal study, not site-level analysis.** Due to coordinate uncertainty in 86% of GBIF records (>1km precision), spatial matching to individual brownfield sites is not feasible. Instead, the project examines Leeds-wide biodiversity trends and their relationship to restoration timeline events.
+This challenges a common assumption in restoration ecology: that tree planting straightforwardly supports fungal biodiversity recovery. The data suggests a 5–10 year disruption window before networks can begin to re-establish, with significant implications for how carbon offsetting schemes account for below-ground ecosystem impacts.
+
+---
 
 ## Project Evolution
 
-**This project began with a different scope and adapted based on data quality findings.**
+This project began with a different scope and adapted based on data quality findings.
 
-**Original plan:** Site-level analysis comparing fungal biodiversity recovery at restored vs. unrestored brownfield sites.
+**Original plan:** Site-level analysis comparing fungal biodiversity at restored vs. unrestored brownfield sites.
 
-**Why the scope changed:** Data quality assessment (Phase 1-2) revealed that 86% of GBIF fungal records have coordinate uncertainty >1km, preventing reliable spatial matching to individual brownfield sites (878 sites, mean area ~1 hectare). Only 10.4% of records met the <100m precision threshold required for site-level analysis.
+**Why the scope changed:** Data quality assessment revealed that 86% of GBIF fungal records have coordinate uncertainty >1km, preventing reliable spatial matching to individual brownfield sites (mean area ~1 hectare). Only 10.4% of records met the <100m precision threshold required for site-level analysis.
 
-**Revised approach:** Citywide temporal analysis examining whether Leeds' fungal biodiversity increased 2009-2025 and whether trends correlate with restoration initiatives. This approach:
-- Uses the full dataset (10,200 records) rather than discarding 90%
-- Addresses meaningful ecological questions about urban biodiversity recovery
-- Acknowledges coordinate uncertainty limitations while working within them
+**Revised approach:** Citywide temporal analysis examining Leeds-wide fungal biodiversity trends and their correlation with restoration timeline events — using the full dataset rather than discarding 90% of records.
 
-**Key lesson:** Citizen science data (GBIF) is valuable for broad temporal/regional trends but unsuitable for fine-scale spatial analysis without quality filtering. Future site-level studies would require systematic plot surveys with <50m GPS precision.
+**Key lesson:** Citizen science data is valuable for broad temporal and regional trends but unsuitable for fine-scale spatial analysis without quality filtering. Future site-level studies would require systematic plot surveys with <50m GPS precision.
 
-## Study Area
+---
 
-**Leeds, UK** — registered brownfield sites from the UK Brownfield Land Register, filtered to those with:
-- Known restoration history (restored with dates, or confirmed unrestored)
-- GBIF fungal occurrence records (2009-2025)
-- Control sites: nearby parks/woodlands that were never brownfield (ancient woodland, established parks)
+## Project Structure
 
-**Why Leeds:**
-- Single unitary authority (cleaner restoration records than multi-borough regions)
-- Active restoration initiatives (White Rose Forest, Northern Forest partnership)
-- Strong NGO presence (Groundwork Leeds, Yorkshire Wildlife Trust)
-- Well-documented tree planting schemes supporting fungal recovery
+```
+leeds-brownfield-fungal-recovery/
+│
+├── data/
+│   ├── raw/
+│   │   ├── leeds_brownfield.csv          # 878 brownfield sites
+│   │   └── leeds_fungi_raw.csv           # 10,200 GBIF occurrence records
+│   └── processed/
+│       ├── leeds_fungi_clean.csv         # 8,548 cleaned records
+│       ├── annual_species_richness.csv   # Species richness 2009–2025
+│       └── fungi_classified.csv          # Records with functional group labels
+│
+├── scripts/
+│   ├── 01_gbif_download.py               # GBIF API query
+│   ├── 02_gbif_clean.py                  # Cleaning and deduplication
+│   ├── 03_temporal_analysis.R            # Rarefaction, GAM, Shannon index
+│   ├── 04_functional_composition.R       # Functional group analysis
+│   ├── 05_restoration_correlation.R      # Tree planting overlay
+│   └── 06_create_map.py                  # Folium interactive map
+│
+├── outputs/
+│   ├── figures/
+│   │   ├── species_richness_trend.png
+│   │   ├── rarefaction_comparison.png
+│   │   ├── gam_trend.png
+│   │   ├── shannon_diversity.png
+│   │   ├── functional_composition.png
+│   │   └── restoration_correlation.png
+│   └── maps/
+│       └── leeds_fungi_interactive.html
+│
+└── README.md
+```
 
-## Data Sources
-
-- **Brownfield sites:** UK Brownfield Land Register (Leeds City Council)
-- **Fungal occurrence records:** GBIF API (species observations with coordinates + dates)
-- **Restoration records:** Leeds City Council planning portal, Groundwork Leeds project reports, White Rose Forest planting records
-- **Land cover validation:** Google Earth historical imagery (confirm restoration timing)
-- **Control sites:** OS MasterMap greenspaces (ancient woodland, established parks)
+---
 
 ## Methodology
 
-### Phase 1: Data Collection ✅
-- [x] Downloaded Leeds brownfield register (878 sites)
-- [x] Queried GBIF API for fungal occurrence records in Leeds (10,200 records, 1,107 species, 2009-2025)
-- [x] Assessed data quality (86% coordinate uncertainty >1km)
+### Phase 1 — Data Collection ✅
+- Downloaded Leeds brownfield register (878 sites)
+- Queried GBIF API for fungal occurrence records in Leeds (10,200 records, 1,107 species, 2009–2025)
+- Assessed data quality — 86% of records have coordinate uncertainty >1km
 
-### Phase 2: Data Cleaning ✅
-- [x] Removed duplicates (same species, location, year)
-- [x] Filtered to species-level identifications
-- [x] Created annual time-series dataset (8,548 records)
+### Phase 2 — Data Cleaning ✅
+- Removed duplicates (same species, location, year)
+- Filtered to species-level identifications
+- Created cleaned annual time-series dataset (8,548 records)
 
-### Phase 3: Temporal Analysis (R)
-- [ ] Plot species accumulation curves (2009-2025)
-- [ ] Calculate Shannon diversity index annually
-- [ ] Test for temporal trends (linear regression, GAM)
-- [ ] Account for recording effort bias (rarefaction analysis)
+### Phase 3 — Temporal Analysis ✅
+- Rarefied species richness to correct for unequal recording effort
+- Calculated Shannon Diversity Index annually
+- Fitted GAM (mgcv) to identify non-linear temporal trend
+- COVID-2020 recording spike identified and corrected by rarefaction
 
-### Phase 4: Restoration Timeline Correlation
-- [ ] Compile Leeds restoration events (tree planting numbers, brownfield projects, dates)
-- [ ] Lag correlation analysis (2-year, 5-year lags)
-- [ ] Statistical test: do diversity spikes follow restoration events?
+### Phase 4 — Restoration Timeline Correlation ✅
+- Compiled Leeds tree planting data: Broughton Sanctuary (160ha, December 2020), South Leeds (62,500 trees, 2021–2022)
+- Overlaid planting volumes against rarefied species richness on dual-axis chart
+- Post-2020 diversity decline coincides with planting activity
 
-### Phase 5: Functional Composition Analysis
-- [ ] Classify fungi by ecological function (mycorrhizal vs. saprotrophic)
-- [ ] Test whether mycorrhizal fungi are increasing (indicates tree establishment)
-- [ ] Identify indicator species (early colonisers vs. late-successional)
+### Phase 5 — Functional Composition Analysis ✅
+- Classified species by ecological function (Mycorrhizal, Saprotrophic, Parasitic, Other/Unknown) via trait database lookup
+- Mycorrhizal proportion declined from ~25–30% (2009) to ~10–15% (2023–2025)
+- Saprotrophic proportion increased — consistent with disturbed soil conditions
 
-### Phase 6: Outputs
-- [ ] Time-series visualisations (ggplot2)
-- [ ] Interactive map showing recording locations (Folium)
-- [ ] Technical write-up (portfolio page)
-- [ ] Stakeholder brief (restoration practitioners)
-
-## Expected Outputs
-
-**Visualisations:**
-- Time-series plots (species richness over time, by site category)
-- Species accumulation curves
-- Indicator species analysis (which fungi appear first after restoration)
-- Interactive map of recording effort distribution
-
-**Deliverables:**
+### Phase 6 — Final Outputs ✅
+- Interactive Folium map (colour-coded by functional group, individual markers)
 - Technical write-up (portfolio page)
-- Restoration practitioner guide (stakeholder PDF)
-- Interactive web map
-- Code repository (R + Python scripts)
+- Stakeholder explainer (portfolio page)
+- README updated
 
-## Technologies
+---
 
-**Data Collection:** GBIF API (Python), web scraping (restoration records)  
-**Analysis:** R (biodiversity metrics, time-series, ggplot2), Python (data cleaning, spatial joins)  
-**Visualisation:** ggplot2, matplotlib, seaborn, Folium (interactive maps)  
-**Geospatial:** GeoPandas, sf, QGIS
+## Data Sources
 
-## Key Literature
+- **GBIF** — citizen science fungal occurrence records for Leeds
+- **Leeds City Council** — tree planting data 2020–2025
 
-- Sheldrake, M. (2020). *Entangled Life: How Fungi Make Our Worlds*
-- Stamets, P. (2005). *Mycelium Running: How Mushrooms Can Help Save the World*
-- Dickie, I. A. et al. (2013). "Ecosystem service and biodiversity trade-offs in woody successions"
-- Teste, F. P. et al. (2017). "Plant-soil feedback and the maintenance of diversity in Mediterranean-climate shrublands"
+---
 
-## Data & Code
+## Tools & Technologies
 
-**Completed phases:**
-- Phase 1: Data collection (878 brownfield sites, 10,200 fungal records)
-- Phase 2: Data cleaning (8,548 cleaned records)
+| Tool | Use |
+|------|-----|
+| Python (pandas, Folium, requests) | Data acquisition, interactive mapping |
+| R (vegan, mgcv, ggplot2, dplyr) | Statistical analysis, visualisation |
+| GBIF API | Biodiversity data download |
 
-**Available datasets:**
-- `data/raw/leeds_brownfield.csv` — 878 brownfield sites (filtered from UK register)
-- `data/gbif/leeds_fungi_raw.csv` — 10,200 GBIF fungal occurrence records
-- `data/processed/leeds_fungi_clean.csv` — 8,548 cleaned records (deduplicated)
-- `data/processed/annual_species_richness.csv` — Species richness 2009-2025
+---
 
-**Code:**
-- `python/gbif_download.py` — GBIF API query script
-- `python/gbif_clean.py` — Data cleaning and deduplication
+## Limitations
 
-## Timeline
+- Citizen science records reflect recording effort as well as actual species presence — rarefaction corrects partially but not fully
+- Data ends 2025, only 3–5 years post-planting — too early to observe recovery
+- No soil sampling or DNA metabarcoding — functional group shifts are inferred from occurrence records, not direct measurement
+- Spatial resolution: Leeds treated as a single unit — site-level analysis around planting locations would provide stronger causal evidence
 
-**Month 3:**
-- Phase 3: Temporal analysis (R)
-- Phase 4: Restoration timeline correlation
+---
 
-**Month 4:**
-- Phase 5: Functional composition analysis
-- Phase 6: Outputs and portfolio write-up
-
-## License
-
-MIT License
-
-## Contact
-
-Daniel Crompton | [LinkedIn](https://www.linkedin.com/in/dtcrompton/) | [Portfolio](https://dtcrompton.github.io)
+*Analysis by Daniel Crompton, 2026 | [dtcrompton.github.io](https://dtcrompton.github.io)*
